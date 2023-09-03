@@ -1,8 +1,6 @@
 const puppeteer = require("puppeteer");
 const {FileChooser} = require("puppeteer");
-const { log } = require("console");
-const fs = require("fs");
-
+const fs = require('fs');
 
 const upload = async (endpoint,data,pathForUpload) => {
     console.log(pathForUpload)
@@ -17,7 +15,7 @@ const upload = async (endpoint,data,pathForUpload) => {
     await page.waitForTimeout(5000)
 
     //+
-    selector = '.author-studio-header__addButton-1Z'
+    let selector = '.author-studio-header__addButton-1Z'
     await page.waitForSelector(`${selector}`,{timeout:60000})
     await page.click(`${selector}`)
     await page.waitForTimeout(5000)
@@ -35,6 +33,17 @@ const upload = async (endpoint,data,pathForUpload) => {
     await page.waitForTimeout(5000)
     await  fileChooser.accept([pathForUpload])
     //загрузка описания, ключевых слов, названия
+
+
+    selector = 'textarea.Textarea-Control:nth-child(2)'
+    await page.waitForSelector(selector)
+    await page.click(selector);
+    await page.keyboard.down('ControlLeft')
+    await page.keyboard.press('a')
+    await page.keyboard.up('ControlLeft')
+    await page.keyboard.type(data.title)
+
+
     selector = 'body > div.ui-lib-modal._view-type_inner-close-m._with-vertical-align._transition-enter-done > div > div > div.video-settings-redesign__form-6f > div.ui-lib-modal-content.video-settings-redesign__container-YN > div > div > div.publication-settings-content.publication-settings-content_is-extra-width > div:nth-child(2) > div > div.quill-text-field__fieldWithCounter-d2 > div.quill-text-field__editorContainer-mB.ql-container > div.ql-editor.ql-blank'
     await page.waitForSelector(selector)
     await page.click(selector);
@@ -46,17 +55,21 @@ const upload = async (endpoint,data,pathForUpload) => {
     await page.keyboard.type(data.keywords)
 
 
-    selector = '.form-actions__action-15'
-    await page.waitForSelector('div.Text:nth-child(2)')
+    selector = 'body > div.ui-lib-modal._view-type_inner-close-m._with-vertical-align._transition-enter-done > div > div > div.video-settings-redesign__form-6f > div.form-actions__actions-3E > button'
+    await page.waitForTimeout(90000)
     await page.click(selector);
 
     let newEndpoint = await brows.wsEndpoint()
 
     await brows.disconnect()
     console.log('>>закончили загрузку')
-    return newEndpoint
 
-    fs.rm(pathForUpload)
+    fs.unlink(pathForUpload, err => {
+        if(err) throw err; // не удалось удалить файл
+        console.log('Файл успешно удалён');
+    });
+
+    return newEndpoint
 
 }
 
