@@ -1,15 +1,20 @@
 const puppeteer = require("puppeteer");
+const fs = require('fs')
+const path = require('path')
 //TODO validator for yotubeParcer and download(with fs)
-const valid = async () => {
-    const brows = await puppeteer.launch({headless: false})
-
-    let link1 = 'https://www.youtube.com/watch?v=lFWDeJ03sJc'
-
-    const page = await brows.newPage()
-    await page.goto(`${link1}`,{waitUntil:'load'})
-
-    const page2 = await brows.newPage()
-    await page2.goto(`${link1}`,{waitUntil:'load'})
+const valid = async (pathForUpload) => {
+    let folderPath = 'C:\\Users\\Даниил\\Downloads'
+    const isFile = fileName => {
+        return fs.lstatSync(fileName).isFile()
+    }
+    let file = fs.readdirSync(folderPath).map(fileName => {
+        return path.join(folderPath, fileName)
+    })
+    file = file.filter(isFile)
+    console.log(file)
+    return file[file.length-1]
 }
 
-valid()
+module.exports = {
+    valid
+}

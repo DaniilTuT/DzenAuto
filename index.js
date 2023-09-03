@@ -4,7 +4,7 @@ const {upload} = require('./upload.js')
 const {dzenRegistration} = require('./registration')
 const puppeteer = require("puppeteer");
 const path = require("path");
-
+const {valid} = require('./validator.js')
 const drg = async () => {
 
     let lastLink = ''
@@ -12,14 +12,14 @@ const drg = async () => {
 
     const page = await browser.newPage()
 
-    const endpoint = await dzenRegistration()
+    let endpoint = await dzenRegistration()
 
-    await page.goto(`https://www.youtube.com/@euronewsru/videos`,{waitUntil: "load",timeout:60000})
+    await page.goto(`https://www.youtube.com/@euronewsru/videos`,{waitUntil: "load"})
     setInterval(async () => {
 
         console.log('>>начинаем поиск видео')
         let selector = 'div.ytd-rich-grid-renderer:nth-child(6)'
-        await page.waitForSelector(`${selector}`,{visible: true})
+        await page.waitForSelector(`${selector}`)
 
         let html = await page.evaluate(() => {
             let html = document.querySelector(`ytd-rich-grid-row.style-scope:nth-child(1) > div:nth-child(1)`).innerHTML
@@ -38,10 +38,15 @@ const drg = async () => {
 
         if (SSLink !== lastLink) {
             lastLink = SSLink
-            let path = await download(SSLink)
+            let pathForUpload = await download(SSLink)
             let data = await youtubeParcer(YoutubeLink)
-            upload(endpoint,data,path)
-        }
+            while (pathForUpload === undefined) {
+                console.log(pathForUpload)
+            }
+            pathForUpload = await valid(pathForUpload)
+            endpoint = upload(endpoint,data,pathForUpload)
+            
+    }
     },150000)
 }
 

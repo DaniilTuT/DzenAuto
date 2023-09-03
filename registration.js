@@ -6,21 +6,21 @@ const dzenRegistration = async () => {
     const page = await browser.newPage()
     await page.goto(`https://dzen.ru/profile/editor/eur0news_po_russki`, {waitUntil: "networkidle2"})
 
-    page.waitForTimeout(3000)
+    await page.waitForTimeout(3000)
 
     //подписка
-    selector = 'body > div.content > div.desktop-layout__container-2A.desktop-layout__isWhiteDzen-3Z > div > main > section.desktop-layout__content-1S > div > div > div.desktop-channel-layout__header._with-border > div > div.desktop-channel-header-layout__desktopChannelInfoLayout-3S > div.desktop-channel-header-layout__controls-18 > div.desktop-channel-header-layout__mainButton-2n > button > span'
+    let selector = 'body > div.content > div.desktop-layout__container-2A.desktop-layout__isWhiteDzen-3Z > div > main > section.desktop-layout__content-1S > div > div > div.desktop-channel-layout__header._with-border > div > div.desktop-channel-header-layout__desktopChannelInfoLayout-3S > div.desktop-channel-header-layout__controls-18 > div.desktop-channel-header-layout__mainButton-2n > button > span'
     await page.waitForSelector(`${selector}`)
     await page.click(`${selector}`)
 
-    page.waitForTimeout(3000)
+    await page.waitForTimeout(3000)
 
     //яндекс id
     selector = 'body > div.Modal.Modal_visible.Modal_hasAnimation.Modal_theme_normal > div.Modal-Wrapper > div > div > div > div.login-content__container-g1 > div.login-content__yaButtonWrapper-15 > a > span.base-login-button__loginButtonText-cT.base-button__childrenContent-DJ'
     await page.waitForSelector(`${selector}`)
     await page.click(`${selector}`)
 
-    page.waitForTimeout(3000)
+    await page.waitForTimeout(3000)
 
     // кликаем по полю ввода что бы поймать фокус
     selector = '#passp-field-login'
@@ -52,13 +52,22 @@ const dzenRegistration = async () => {
 
         await page.click('body > div > div.layout-inner > div.domik-wrap > div > div.domik-content > form > div.domik-row > div > button > span')
     }
+
+    //перейти в студию
+    selector = '.desktop-channel-header-layout__mainButton-2n > button:nth-child(1)'
+    await page.waitForSelector(`${selector}`,{timeout:60000})
+    await page.click(`${selector}`)
+    await page.waitForTimeout(5000)
+
     let endpoint = await browser.wsEndpoint()
 
     await browser.disconnect()
     console.log('>>зарегестрировались в браузере')
     return endpoint
-
 }
+
+//dzenRegistration()
+
 module.exports = {
     dzenRegistration
 }

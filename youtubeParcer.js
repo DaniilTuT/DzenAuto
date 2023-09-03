@@ -1,9 +1,6 @@
 const puppeteer = require('puppeteer')
 const youtubeParcer = async (link) => {
     const brows = await puppeteer.launch({headless:false})
-
-
-
     const page = await brows.newPage()
     await page.goto(`${link}`,{waitUntil:'load'})
     await page.waitForSelector('#expand')
@@ -37,8 +34,11 @@ const youtubeParcer = async (link) => {
     setTimeout(async () => {
         await brows.close()
     }, 5000, brows);
+    return Data
 }
 
+
+//youtubeParcer('https://www.youtube.com/watch?v=QZzJ5aQZL_I')
 module.exports = {
     youtubeParcer
 }

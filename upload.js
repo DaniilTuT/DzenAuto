@@ -1,22 +1,21 @@
 const puppeteer = require("puppeteer");
 const {FileChooser} = require("puppeteer");
-const path = require("path");
+const { log } = require("console");
+const fs = require("fs");
 
 
-const upload = async (endpoint,data,path) => {
+const upload = async (endpoint,data,pathForUpload) => {
+    console.log(pathForUpload)
+    console.log(data)
+    
     const brows = await puppeteer.connect({browserWSEndpoint:endpoint})
     let pageList = await brows.pages()
     const page = pageList[0]
-    console.log(pageList)
     await page.bringToFront()
     await page.goto(`https://dzen.ru/profile/editor/eur0news_po_russki`,{waitUntil: "load"})
 
     await page.waitForTimeout(5000)
-    //перейти в студию
-    let selector = '.desktop-channel-header-layout__mainButton-2n > button:nth-child(1)'
-    await page.waitForSelector(`${selector}`,{timeout:60000})
-    await page.click(`${selector}`)
-    await page.waitForTimeout(5000)
+
     //+
     selector = '.author-studio-header__addButton-1Z'
     await page.waitForSelector(`${selector}`,{timeout:60000})
@@ -34,7 +33,7 @@ const upload = async (endpoint,data,path) => {
     await page.click(`${selector}`)
     let fileChooser = await futureFileChooser
     await page.waitForTimeout(5000)
-    await  fileChooser.accept([path])
+    await  fileChooser.accept([pathForUpload])
     //загрузка описания, ключевых слов, названия
     selector = 'body > div.ui-lib-modal._view-type_inner-close-m._with-vertical-align._transition-enter-done > div > div > div.video-settings-redesign__form-6f > div.ui-lib-modal-content.video-settings-redesign__container-YN > div > div > div.publication-settings-content.publication-settings-content_is-extra-width > div:nth-child(2) > div > div.quill-text-field__fieldWithCounter-d2 > div.quill-text-field__editorContainer-mB.ql-container > div.ql-editor.ql-blank'
     await page.waitForSelector(selector)
@@ -47,9 +46,18 @@ const upload = async (endpoint,data,path) => {
     await page.keyboard.type(data.keywords)
 
 
-    selector = 'body > div.ui-lib-modal._view-type_inner-close-m._with-vertical-align._transition-enter-done > div > div > div.video-settings-redesign__form-6f > div.form-actions__actions-3E > button'
-    await page.waitForSelector(selector)
+    selector = '.form-actions__action-15'
+    await page.waitForSelector('div.Text:nth-child(2)')
     await page.click(selector);
+
+    let newEndpoint = await brows.wsEndpoint()
+
+    await brows.disconnect()
+    console.log('>>закончили загрузку')
+    return newEndpoint
+
+    fs.rm(pathForUpload)
+
 }
 
 module.exports = {
