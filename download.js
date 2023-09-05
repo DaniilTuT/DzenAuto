@@ -2,7 +2,9 @@ const puppeteer = require('puppeteer')
 
 
 const download = async (link) => {
+    let today = new Date()
     console.log(">>начинаю загрузку видео")
+    console.log(today.toLocaleTimeString())
     const brows = await puppeteer.launch( {headless: false})
 
     const page1 = await brows.newPage()
@@ -21,12 +23,12 @@ const download = async (link) => {
     let pathForUpload = 'C:\\Users\\Даниил\\Downloads\\' + html.substring(html.indexOf('download="')+10,html.indexOf('" data-quality="'))
     console.log("Полный путь до видео: "+pathForUpload)
     setTimeout(async () => {
-        await brows.close()
-        console.log(pathForUpload)
+        await brows.close()    
     }, 90000,brows);
-    console.log(pathForUpload)
     return pathForUpload
 }
+
+//download('https://www.SSyoutube.com/watch?v=ZexRVKtNKvc')
 
 module.exports = {
     download

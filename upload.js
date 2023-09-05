@@ -3,8 +3,8 @@ const {FileChooser} = require("puppeteer");
 const fs = require('fs');
 
 const upload = async (endpoint,data,pathForUpload) => {
-    console.log(pathForUpload)
-    console.log(data)
+    // console.log(pathForUpload)
+    // console.log(data)
     
     const brows = await puppeteer.connect({browserWSEndpoint:endpoint})
     let pageList = await brows.pages()
@@ -56,9 +56,17 @@ const upload = async (endpoint,data,pathForUpload) => {
 
 
     selector = 'body > div.ui-lib-modal._view-type_inner-close-m._with-vertical-align._transition-enter-done > div > div > div.video-settings-redesign__form-6f > div.form-actions__actions-3E > button'
-    await page.waitForTimeout(90000)
+    await page.waitForSelector(selector)
     await page.click(selector);
-
+    let isClicked = false
+    while (!isClicked) {
+        try {
+            await page.click(selector);
+        }
+        catch {
+            isClicked = true
+        }
+    }
     let newEndpoint = await brows.wsEndpoint()
 
     await brows.disconnect()

@@ -2,7 +2,7 @@ const puppeteer = require("puppeteer");
 const {login,password} = require('./password.js')
 const dzenRegistration = async () => {
     const browser = await puppeteer.launch({headless:false})
-
+    let today = new Date()
     const page = await browser.newPage()
     await page.goto(`https://dzen.ru/profile/editor/eur0news_po_russki`, {waitUntil: "networkidle2"})
 
@@ -54,15 +54,16 @@ const dzenRegistration = async () => {
     }
 
     //перейти в студию
-    selector = '.desktop-channel-header-layout__mainButton-2n > button:nth-child(1)'
-    await page.waitForSelector(`${selector}`,{timeout:60000})
-    await page.click(`${selector}`)
-    await page.waitForTimeout(5000)
+    // selector = '.desktop-channel-header-layout_mainButton-2n > button:nth-child(1)'
+    // await page.waitForSelector(`${selector}`,{timeout:60000})
+    // await page.click(`${selector}`)
+    // await page.waitForTimeout(5000)
 
     let endpoint = await browser.wsEndpoint()
 
     await browser.disconnect()
     console.log('>>зарегестрировались в браузере')
+    console.log(today.toLocaleTimeString())
     return endpoint
 }
 
