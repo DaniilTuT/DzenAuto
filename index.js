@@ -19,6 +19,7 @@ const drg = async () => {
             lastLink = links.SSLink
             let pathForUpload = await download(links.SSLink)
             let data = await youtubeParcer(links.YoutubeLink)
+            await valid()
             pathForUpload = await valid()
             endpoint = await upload(endpoint,data,pathForUpload)
     }
