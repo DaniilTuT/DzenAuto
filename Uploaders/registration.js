@@ -1,25 +1,32 @@
 const puppeteer = require("puppeteer");
-const {login,password} = require('./password.js')
-const dzenRegistration = async () => {
-    const browser = await puppeteer.launch({headless:false})
-    let today = new Date()
-    const page = await browser.newPage()
-    await page.goto(`https://dzen.ru/profile/editor/eur0news_po_russki`, {waitUntil: "networkidle2"})
+const {login,password} = require('../Helpers/password')
+const {UPLOAD_CONNECTION} = require("../Classes/Connection");
 
+
+
+
+const dzenRegistration = async () => {
+    await UPLOAD_CONNECTION.init()
+    let page = await UPLOAD_CONNECTION.page
+    let today = new Date()
+    await page.goto(`https://dzen.ru/profile/editor/eur0news_po_russki`, {waitUntil: "networkidle2"})
+    await page.waitForTimeout(3000)
+    await page.goto(`https://dzen.ru/profile/editor/eur0news_po_russki`, {waitUntil: "networkidle2"})
     await page.waitForTimeout(3000)
 
     //подписка
-    let selector = 'body > div.content > div.desktop-layout__container-2A.desktop-layout__isWhiteDzen-3Z > div > main > section.desktop-layout__content-1S > div > div > div.desktop-channel-layout__header._with-border > div > div.desktop-channel-header-layout__desktopChannelInfoLayout-3S > div.desktop-channel-header-layout__controls-18 > div.desktop-channel-header-layout__mainButton-2n > button > span'
-    await page.waitForSelector(`${selector}`)
-    await page.click(`${selector}`)
 
+    let selector = 'div.desktop2--desktop-info-layout__mainButton-1q > button > span'
+    await page.waitForSelector(selector,{visibility:"visible"})
+    await page.hover(selector);
+    await page.waitForTimeout(500)
+    await page.click(selector,{ delay: 100, button: 'left' })
     await page.waitForTimeout(3000)
 
     //яндекс id
-    selector = 'body > div.Modal.Modal_visible.Modal_hasAnimation.Modal_theme_normal > div.Modal-Wrapper > div > div > div > div.login-content__container-g1 > div.login-content__yaButtonWrapper-15 > a > span.base-login-button__loginButtonText-cT.base-button__childrenContent-DJ'
-    await page.waitForSelector(`${selector}`)
+    selector = 'body > div.desktop2--modal__rootElement-l4 > div.desktop2--modal__modal-Hw > div.desktop2--login-content__container-g1.desktop2--login-content__isAuthThroughPhone-3W.desktop2--login-content__isLoginModalInCenter-3W > div.desktop2--login-content__yaButtonWrapper-15.desktop2--login-content__isAuthThroughPhone-3W > a > span.desktop2--base-login-button__loginButtonText-cT.desktop2--base-button__childrenContent-DJ'
+    await page.waitForSelector(`${selector}`,{timeout:60000,visibility:"visible"})
     await page.click(`${selector}`)
-
     await page.waitForTimeout(3000)
 
     // кликаем по полю ввода что бы поймать фокус
@@ -52,22 +59,9 @@ const dzenRegistration = async () => {
 
         await page.click('body > div > div.layout-inner > div.domik-wrap > div > div.domik-content > form > div.domik-row > div > button > span')
     }
-
-    //перейти в студию
-    // selector = '.desktop-channel-header-layout_mainButton-2n > button:nth-child(1)'
-    // await page.waitForSelector(`${selector}`,{timeout:60000})
-    // await page.click(`${selector}`)
-    // await page.waitForTimeout(5000)
-
-    let endpoint = await browser.wsEndpoint()
-
-    await browser.disconnect()
-    console.log('>>зарегестрировались в браузере')
-    console.log(today.toLocaleTimeString())
-    return endpoint
+    console.log('\n>>зарегестрировались в браузере\n  '+today.toLocaleTimeString())
 }
 
-//dzenRegistration()
 
 module.exports = {
     dzenRegistration
